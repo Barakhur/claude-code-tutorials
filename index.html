@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — Beginner Tutorials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #ff6b35;
+    --accent2: #7c3aed;
+    --accent3: #06b6d4;
+    --text: #e8e8f0;
+    --muted: #888899;
+    --code-bg: #0d0d15;
+    --green: #22c55e;
+    --yellow: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    z-index: 10;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: white;
+  }
+
+  .logo span { color: var(--muted); margin-left: 2px; }
+
+  .header-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    background: rgba(255,107,53,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(255,107,53,0.3);
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem);
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent3);
+    border: 1px solid rgba(6,182,212,0.25);
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-tag::before {
+    content: '▶';
+    font-size: 0.6rem;
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    max-width: 800px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+    position: relative;
+  }
+
+  h1 em::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0.4;
+    border-radius: 2px;
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 540px;
+    line-height: 1.65;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* LAYOUT */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 64px);
+    gap: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+
+  .sidebar-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    padding-left: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.875rem;
+    color: var(--muted);
+    border: 1px solid transparent;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .nav-item.active {
+    background: rgba(255,107,53,0.1);
+    color: var(--accent);
+    border-color: rgba(255,107,53,0.25);
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .nav-item.active .nav-dot { opacity: 1; }
+
+  .progress-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .lessons-done {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    margin-top: 6px;
+  }
+
+  /* CONTENT */
+  .content-area {
+    padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .tutorial-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    max-width: 820px;
+  }
+
+  .tutorial-panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 60px;
+  }
+
+  .panel-meta { flex: 1; }
+
+  .panel-category {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .panel-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+  }
+
+  .panel-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .time-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  /* CONTENT BLOCKS */
+  .lesson-body { font-size: 0.95rem; line-height: 1.75; }
+
+  .lesson-body h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 2rem 0 0.75rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lesson-body h3::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .lesson-body p { color: var(--muted); margin-bottom: 1rem; }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .code-block .c-comment { color: #4a4a5a; }
+  .code-block .c-cmd { color: var(--accent); }
+  .code-block .c-string { color: var(--green); }
+  .code-block .c-flag { color: var(--accent3); }
+  .code-block .c-out { color: var(--yellow); }
+
+  .tip-box {
+    background: rgba(6,182,212,0.06);
+    border: 1px solid rgba(6,182,212,0.2);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .tip-icon { flex-shrink: 0; font-size: 1rem; }
+
+  .warn-box {
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .step-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 20px;
+    margin-top: 1px;
+  }
+
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .cmd-card:hover { border-color: var(--accent2); }
+
+  .cmd-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .cmd-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* NAV BUTTONS */
+  .panel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: #e55a25; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--text); }
+
+  .complete-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .complete-btn:hover { border-color: var(--green); color: var(--green); }
+  .complete-btn.done { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.06); }
+  .complete-btn .check { font-size: 1rem; }
+
+  /* HOMEPAGE */
+  #home-panel {
+    display: block;
+    max-width: 820px;
+  }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .lesson-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lesson-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+    transform-origin: left;
+  }
+
+  .lesson-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .lesson-card:hover::before { transform: scaleX(1); }
+
+  .card-icon { font-size: 1.5rem; }
+  .card-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .card-time {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: auto;
+  }
+
+  .card-done-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 18px;
+    height: 18px;
+    background: var(--green);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: white;
+  }
+
+  .lesson-card.done .card-done-badge { display: flex; }
+
+  /* RESPONSIVE */
+  @media (max-width: 720px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem;
+    }
+    .sidebar-section { margin-bottom: 0; }
+    .nav-items-wrap { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-item { font-size: 0.78rem; padding: 6px 10px; }
+    .progress-wrap { display: none; }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">CC</div>
+    Claude Code <span>/ Tutorials</span>
+  </div>
+  <div class="header-badge">Beginner Track</div>
+</header>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Terminal-native AI coding</div>
+  <h1>Master <em>Claude Code</em><br>from scratch.</h1>
+  <p class="hero-sub">6 hands-on lessons that take you from zero to productive. No prior AI tooling experience required.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">6</span>
+      <span class="stat-label">Lessons</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">~45m</span>
+      <span class="stat-label">Total time</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">Free</span>
+      <span class="stat-label">With Claude sub</span>
+    </div>
+  </div>
+</div>
+
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Your progress</span>
+        <span id="pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="lessons-done" id="lessons-done">0 / 6 complete</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Lessons</div>
+      <div class="nav-items-wrap">
+        <div class="nav-item active" data-target="home-panel">
+          <span class="nav-dot"></span> Overview
+        </div>
+        <div class="nav-item" data-target="l1">
+          <span class="nav-dot"></span> 1. What is Claude Code?
+        </div>
+        <div class="nav-item" data-target="l2">
+          <span class="nav-dot"></span> 2. Installation
+        </div>
+        <div class="nav-item" data-target="l3">
+          <span class="nav-dot"></span> 3. Your First Session
+        </div>
+        <div class="nav-item" data-target="l4">
+          <span class="nav-dot"></span> 4. Essential Commands
+        </div>
+        <div class="nav-item" data-target="l5">
+          <span class="nav-dot"></span> 5. CLAUDE.md Setup
+        </div>
+        <div class="nav-item" data-target="l6">
+          <span class="nav-dot"></span> 6. Plan Mode & Tips
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="content-area">
+
+    <!-- HOME -->
+    <div id="home-panel" class="tutorial-panel active">
+      <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:0.5rem;">All Lessons</h2>
+      <p style="color:var(--muted);margin-bottom:1.5rem;font-size:0.9rem;">Click any lesson to start. Complete them in order for best results.</p>
+      <div class="home-grid">
+        <div class="lesson-card" data-target="l1">
+          <div class="card-done-badge" id="badge-l1">✓</div>
+          <div class="card-icon">🤖</div>
+          <div class="card-num">Lesson 01</div>
+          <div class="card-title">What is Claude Code?</div>
+          <div class="card-time">⏱ 5 min</div>
+        </div>
+        <div class="lesson-card" data-target="l2">
+          <div class="card-done-badge" id="badge-l2">✓</div>
+          <div class="card-icon">⚙️</div>
+          <div class="card-num">Lesson 02</div>
+          <div class="card-title">Installation & Setup</div>
+          <div class="card-time">⏱ 8 min</div>
+        </div>
+        <div class="lesson-card" data-target="l3">
+          <div class="card-done-badge" id="badge-l3">✓</div>
+          <div class="card-icon">🚀</div>
+          <div class="card-num">Lesson 03</div>
+          <div class="card-title">Your First Session</div>
+          <div class="card-time">⏱ 8 min</div>
+        </div>
+        <div class="lesson-card" data-target="l4">
+          <div class="card-done-badge" id="badge-l4">✓</div>
+          <div class="card-icon">💻</div>
+          <div class="card-num">Lesson 04</div>
+          <div class="card-title">Essential Commands</div>
+          <div class="card-time">⏱ 8 min</div>
+        </div>
+        <div class="lesson-card" data-target="l5">
+          <div class="card-done-badge" id="badge-l5">✓</div>
+          <div class="card-icon">📄</div>
+          <div class="card-num">Lesson 05</div>
+          <div class="card-title">CLAUDE.md Setup</div>
+          <div class="card-time">⏱ 8 min</div>
+        </div>
+        <div class="lesson-card" data-target="l6">
+          <div class="card-done-badge" id="badge-l6">✓</div>
+          <div class="card-icon">🧠</div>
+          <div class="card-num">Lesson 06</div>
+          <div class="card-title">Plan Mode & Best Tips</div>
+          <div class="card-time">⏱ 8 min</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 1 -->
+    <div id="l1" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">01</div>
+        <div class="panel-meta">
+          <div class="panel-category">Introduction</div>
+          <div class="panel-title">What is Claude Code?</div>
+          <div class="panel-desc">Understand how Claude Code works and why it's different from other AI coding tools.</div>
+        </div>
+        <div class="time-badge">⏱ 5 min</div>
+      </div>
+      <div class="lesson-body">
+        <p>Claude Code is Anthropic's <strong style="color:var(--text)">terminal-native AI coding assistant</strong>. Unlike browser-based chatbots or IDE extensions, it runs directly in your terminal and has full access to your local files.</p>
+
+        <h3>The core idea</h3>
+        <p>Think of it like having a senior developer sitting next to you in your terminal — one who can read your entire codebase, write and edit files, run commands, and reason through multi-step problems. You describe what you want in plain English, and Claude Code figures out how to do it.</p>
+
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <span>Claude Code launched in February 2025 and hit general availability in May 2025. By late 2025 it had contributed to over $1 billion in annualized revenue for Anthropic — developers are adopting it fast.</span>
+        </div>
+
+        <h3>How it's different</h3>
+        <ul class="step-list">
+          <li><span class="step-num">vs</span> <strong>GitHub Copilot</strong> — Copilot suggests code as you type (~8k token context). Claude Code reasons across your entire project with a 200,000 token context window.</li>
+          <li><span class="step-num">vs</span> <strong>ChatGPT / Claude.ai</strong> — Browser chatbots can't touch your files. Claude Code can read, write, and execute code on your machine.</li>
+          <li><span class="step-num">vs</span> <strong>Cursor</strong> — Cursor is IDE-based. Claude Code lives in the terminal and works anywhere, including SSH sessions.</li>
+        </ul>
+
+        <h3>What it can do</h3>
+        <p>Claude Code is an <em style="color:var(--text);font-style:normal">agentic</em> system — meaning it chains actions together rather than just answering questions. It can:</p>
+        <ul class="step-list">
+          <li><span class="step-num">→</span> Read and analyze your entire project structure</li>
+          <li><span class="step-num">→</span> Write, edit, and create files across multiple directories</li>
+          <li><span class="step-num">→</span> Run terminal commands (tests, builds, linters) on your behalf</li>
+          <li><span class="step-num">→</span> Search the web for current best practices</li>
+          <li><span class="step-num">→</span> Work through multi-step tasks autonomously while keeping you in control</li>
+        </ul>
+
+        <div class="warn-box">
+          <span class="tip-icon">⚠️</span>
+          <span>Claude Code always asks permission before modifying files or running commands — unless you explicitly enable "dangerously skip permissions" mode. You're always in control.</span>
+        </div>
+
+        <h3>Who is it for?</h3>
+        <p>Claude Code is useful for everyone from beginners scaffolding their first project to senior engineers working on large codebases. Non-technical roles like PMs and designers are also using it to build and automate without deep coding knowledge.</p>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('home-panel')">← Overview</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l1" onclick="markDone('l1')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('l2')">Next: Installation →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 2 -->
+    <div id="l2" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">02</div>
+        <div class="panel-meta">
+          <div class="panel-category">Setup</div>
+          <div class="panel-title">Installation & Setup</div>
+          <div class="panel-desc">Get Claude Code installed on Mac, Windows, or Linux in under 5 minutes.</div>
+        </div>
+        <div class="time-badge">⏱ 8 min</div>
+      </div>
+      <div class="lesson-body">
+        <h3>Prerequisites</h3>
+        <p>Before installing, you'll need:</p>
+        <ul class="step-list">
+          <li><span class="step-num">1</span> A <strong style="color:var(--text)">Claude subscription</strong> (Pro at $20/month works well for most users) or API access via Anthropic Console.</li>
+          <li><span class="step-num">2</span> macOS, Linux, or Windows 10+ with PowerShell</li>
+          <li><span class="step-num">3</span> A terminal (Terminal.app, iTerm2, Windows Terminal, etc.)</li>
+        </ul>
+
+        <h3>Install using the native installer (recommended)</h3>
+        <p>The native installer is the official method and supports auto-updates. Choose your OS:</p>
+
+        <div class="code-block">
+          <span class="code-label">macOS / Linux</span>
+          <span class="c-comment"># Run this in your terminal:</span><br>
+          <span class="c-cmd">curl -fsSL https://claude.ai/install.sh | sh</span>
+        </div>
+
+        <div class="code-block">
+          <span class="code-label">Windows PowerShell</span>
+          <span class="c-cmd">irm https://claude.ai/install.ps1 | iex</span>
+        </div>
+
+        <div class="tip-box">
+          <span class="tip-icon">🍺</span>
+          <span>You can also install via <strong>Homebrew</strong>: <code style="font-family:'Space Mono',monospace;font-size:0.85em">brew install --cask claude-code</code> or via <strong>WinGet</strong>: <code style="font-family:'Space Mono',monospace;font-size:0.85em">winget install Anthropic.ClaudeCode</code>. Note: these methods require manual updates.</span>
+        </div>
+
+        <h3>Verify the installation</h3>
+        <div class="code-block">
+          <span class="c-cmd">claude --version</span><br>
+          <span class="c-out"># Should print something like: claude 1.x.x</span>
+        </div>
+
+        <p>If the <code style="font-family:'Space Mono',monospace;color:var(--accent3)">claude</code> command isn't found, restart your terminal. PATH issues after installation are the most common problem — a fresh restart usually fixes it.</p>
+
+        <h3>Authentication</h3>
+        <p>Run claude in any directory to start the authentication flow:</p>
+        <div class="code-block">
+          <span class="c-cmd">claude</span><br>
+          <span class="c-out"># Opens a browser window to log in with your Anthropic account</span>
+        </div>
+
+        <p>Once authenticated, your credentials are stored. You won't need to log in again unless you switch accounts (use <code style="font-family:'Space Mono',monospace;color:var(--accent3)">/login</code> to switch).</p>
+
+        <h3>Billing notes</h3>
+        <p>With a Claude Pro subscription, usage is included in your plan. For API/Console access, charges are per token — the Console auto-creates a "Claude Code" workspace for cost tracking.</p>
+
+        <div class="warn-box">
+          <span class="tip-icon">⚠️</span>
+          <span>Some older tutorials still recommend <code style="font-family:'Space Mono',monospace">npm install -g @anthropic-ai/claude-code</code>. That method is no longer the recommended approach. Use the native installer above.</span>
+        </div>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('l1')">← Lesson 1</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l2" onclick="markDone('l2')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('l3')">Next: First Session →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 3 -->
+    <div id="l3" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">03</div>
+        <div class="panel-meta">
+          <div class="panel-category">Basics</div>
+          <div class="panel-title">Your First Session</div>
+          <div class="panel-desc">Open Claude Code on a real project and make your first code change.</div>
+        </div>
+        <div class="time-badge">⏱ 8 min</div>
+      </div>
+      <div class="lesson-body">
+        <h3>Starting a session</h3>
+        <p>Navigate to any project folder in your terminal and run <code style="font-family:'Space Mono',monospace;color:var(--accent3)">claude</code>:</p>
+        <div class="code-block">
+          <span class="c-cmd">cd ~/my-project</span><br>
+          <span class="c-cmd">claude</span>
+        </div>
+        <p>You'll see a welcome screen showing your working directory, the model in use, and hints for getting started. The interface is a conversational prompt — type your message and hit Enter.</p>
+
+        <h3>Step 1 — Explore your codebase</h3>
+        <p>Start by asking Claude to explain your project. It will read your files and build an understanding:</p>
+        <div class="code-block">
+          <span class="code-label">Try these first prompts</span>
+          <span class="c-out">What does this project do?</span><br>
+          <span class="c-out">Give me an overview of the codebase structure.</span><br>
+          <span class="c-out">Where is the main entry point?</span>
+        </div>
+        <p>Claude reads your project files on demand — you don't have to manually paste code into the chat.</p>
+
+        <h3>Step 2 — Make a small edit</h3>
+        <p>Now try a simple change to see the full workflow:</p>
+        <div class="code-block">
+          <span class="c-out">Add a console.log at the start of the main function that prints "App started"</span>
+        </div>
+        <p>Claude will: analyze the relevant file → show you the proposed change as a diff → ask for your approval → apply it once you say yes.</p>
+
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <span><strong>Key insight:</strong> Claude Code always asks permission before modifying files. You review each change before anything is written. You can also enable "Accept all" mode for a session when you're comfortable.</span>
+        </div>
+
+        <h3>Step 3 — Ask it to fix a bug</h3>
+        <div class="code-block">
+          <span class="c-out">The login form throws an error when the email field is empty. Find and fix it.</span>
+        </div>
+        <p>Talk to Claude like you'd describe the problem to a colleague. You don't need to know which file contains the bug — Claude will find it.</p>
+
+        <h3>Keyboard shortcuts</h3>
+        <ul class="step-list">
+          <li><span class="step-num">↑</span> Navigate back through previous prompts — even from past sessions</li>
+          <li><span class="step-num">Tab</span> Autocomplete file paths and command names</li>
+          <li><span class="step-num">Ctrl+C</span> Cancel a running task</li>
+          <li><span class="step-num">Esc</span> Back out of the current prompt</li>
+        </ul>
+
+        <h3>Interactive vs one-shot mode</h3>
+        <p>For quick one-off queries, you can skip the interactive session entirely:</p>
+        <div class="code-block">
+          <span class="c-flag">-p</span> flag for one-shot mode:<br><br>
+          <span class="c-cmd">claude -p "What kind of project is this?"</span><br>
+          <span class="c-cmd">claude -p "List all React components in src/"</span>
+        </div>
+        <p>One-shot mode is perfect when you want a fast answer without entering an interactive session.</p>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('l2')">← Lesson 2</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l3" onclick="markDone('l3')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('l4')">Next: Commands →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 4 -->
+    <div id="l4" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">04</div>
+        <div class="panel-meta">
+          <div class="panel-category">Core Skills</div>
+          <div class="panel-title">Essential Commands</div>
+          <div class="panel-desc">The slash commands and CLI flags you'll use every single day.</div>
+        </div>
+        <div class="time-badge">⏱ 8 min</div>
+      </div>
+      <div class="lesson-body">
+        <h3>Slash commands (inside a session)</h3>
+        <p>These are typed directly into the Claude Code prompt during an interactive session:</p>
+        <div class="cmd-grid">
+          <div class="cmd-card">
+            <div class="cmd-name">/help</div>
+            <div class="cmd-desc">Show all available commands and keyboard shortcuts.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/clear</div>
+            <div class="cmd-desc">Reset conversation history to free up context. Use this when starting a new task.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/plan</div>
+            <div class="cmd-desc">Enter Plan Mode — Claude outlines steps before doing anything. Great for complex tasks.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/init</div>
+            <div class="cmd-desc">Generate a CLAUDE.md file for your project. Run this once when starting with a new codebase.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/compact</div>
+            <div class="cmd-desc">Compress conversation history when context is 70-90% full, without losing important details.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/resume</div>
+            <div class="cmd-desc">Continue a previous conversation. Useful for picking up long-running tasks.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/login</div>
+            <div class="cmd-desc">Switch to a different Anthropic account or re-authenticate.</div>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-name">/exit</div>
+            <div class="cmd-desc">Close the current session cleanly.</div>
+          </div>
+        </div>
+
+        <h3>CLI flags (when launching claude)</h3>
+        <div class="code-block">
+          <span class="code-label">Terminal</span>
+          <span class="c-comment"># One-shot query</span><br>
+          <span class="c-cmd">claude <span class="c-flag">-p</span> <span class="c-string">"summarize the auth module"</span></span><br><br>
+          <span class="c-comment"># Continue last conversation</span><br>
+          <span class="c-cmd">claude <span class="c-flag">-c</span></span><br><br>
+          <span class="c-comment"># Resume a specific session by ID</span><br>
+          <span class="c-cmd">claude <span class="c-flag">-r</span> SESSION_ID</span><br><br>
+          <span class="c-comment"># Skip permission prompts (advanced — use with care)</span><br>
+          <span class="c-cmd">claude <span class="c-flag">--dangerously-skip-permissions</span></span>
+        </div>
+
+        <div class="tip-box">
+          <span class="tip-icon">🔥</span>
+          <span><strong>Pro tip on /clear:</strong> Use it every time you start a new task. Old conversation history eats your context window and can confuse Claude. Type /clear, then start fresh. Your CLAUDE.md context is preserved.</span>
+        </div>
+
+        <h3>Context window management</h3>
+        <p>Claude Code has a 200,000 token context window — far larger than most tools. But it still fills up. Here's the strategy:</p>
+        <ul class="step-list">
+          <li><span class="step-num">0–50%</span> Work freely. No action needed.</li>
+          <li><span class="step-num">50–70%</span> Stay aware. Finish current task soon.</li>
+          <li><span class="step-num">70–90%</span> Run <code style="font-family:'Space Mono',monospace;color:var(--accent3)">/compact</code> to compress history.</li>
+          <li><span class="step-num">90%+</span> Run <code style="font-family:'Space Mono',monospace;color:var(--accent3)">/clear</code> immediately. Responses become erratic above 90%.</li>
+        </ul>
+
+        <h3>Message queuing</h3>
+        <p>You can type multiple prompts and Claude will work through them in order. Instead of waiting, queue your next tasks while the current one runs:</p>
+        <div class="code-block">
+          <span class="c-out">Add unit tests for the user service</span><br>
+          <span class="c-comment"># (Claude starts working — you type the next one while it runs)</span><br>
+          <span class="c-out">Also add JSDoc comments to all exported functions</span><br>
+          <span class="c-out">And update the README with the new test commands</span>
+        </div>
+        <p>Claude is smart about queuing — it won't auto-run the next task if it needs your feedback mid-task.</p>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('l3')">← Lesson 3</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l4" onclick="markDone('l4')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('l5')">Next: CLAUDE.md →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 5 -->
+    <div id="l5" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">05</div>
+        <div class="panel-meta">
+          <div class="panel-category">Configuration</div>
+          <div class="panel-title">CLAUDE.md Setup</div>
+          <div class="panel-desc">Give Claude a persistent memory for your project so it follows your rules every session.</div>
+        </div>
+        <div class="time-badge">⏱ 8 min</div>
+      </div>
+      <div class="lesson-body">
+        <h3>What is CLAUDE.md?</h3>
+        <p>CLAUDE.md is a markdown file at the root of your project. Claude Code automatically reads it when starting a session. Think of it as <strong style="color:var(--text)">onboarding documentation for your AI teammate</strong> — it tells Claude your conventions, rules, and architectural decisions upfront.</p>
+
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <span><strong>Without CLAUDE.md</strong>, Claude makes reasonable guesses about your conventions — sometimes right, often wrong. <strong>With it</strong>, Claude follows your exact standards from the very first prompt.</span>
+        </div>
+
+        <h3>Generate one automatically with /init</h3>
+        <p>Start a Claude session in your project, then run:</p>
+        <div class="code-block">
+          <span class="c-cmd">/init</span><br>
+          <span class="c-out"># Claude analyzes your project and generates a starter CLAUDE.md</span>
+        </div>
+        <p>Claude will detect your build systems, test frameworks, package manager, and code patterns. Review the output and <strong style="color:var(--text)">trim aggressively</strong> — bloated CLAUDE.md files cause Claude to ignore your instructions. Keep it concise.</p>
+
+        <h3>What to include</h3>
+        <div class="code-block">
+          <span class="code-label">CLAUDE.md example</span>
+          <span class="c-comment"># Project: My SaaS App</span><br><br>
+          <span class="c-comment">## Stack</span><br>
+          <span class="c-out">- Next.js 14 (App Router), TypeScript, Tailwind</span><br>
+          <span class="c-out">- Supabase for auth + database (Postgres)</span><br>
+          <span class="c-out">- Vitest for unit tests, Playwright for e2e</span><br><br>
+          <span class="c-comment">## Code conventions</span><br>
+          <span class="c-out">- Functional components only, no class components</span><br>
+          <span class="c-out">- Always use TypeScript strict mode</span><br>
+          <span class="c-out">- Named exports, not default exports</span><br>
+          <span class="c-out">- Error handling: always use Result type pattern</span><br><br>
+          <span class="c-comment">## Commands</span><br>
+          <span class="c-out">- Build: npm run build</span><br>
+          <span class="c-out">- Test: npm test (watch: npm run test:watch)</span><br>
+          <span class="c-out">- Lint: npm run lint</span><br><br>
+          <span class="c-comment">## Important</span><br>
+          <span class="c-out">- Never use any as a TypeScript type</span><br>
+          <span class="c-out">- Always write tests for new API routes</span><br>
+          <span class="c-out">- Use server actions for form submissions, not API routes</span>
+        </div>
+
+        <h3>What NOT to include</h3>
+        <ul class="step-list">
+          <li><span class="step-num">✗</span> Information Claude can already discover by reading your code (file structure, import patterns)</li>
+          <li><span class="step-num">✗</span> Long explanations — use bullet points only</li>
+          <li><span class="step-num">✗</span> Secrets or API keys — CLAUDE.md can end up in version control</li>
+        </ul>
+
+        <h3>Multiple CLAUDE.md files</h3>
+        <p>In a monorepo, you can have a root CLAUDE.md plus per-package CLAUDE.md files. Claude reads all relevant ones based on which files it's working with.</p>
+
+        <div class="warn-box">
+          <span class="tip-icon">⚠️</span>
+          <span>Most of what <code style="font-family:'Space Mono',monospace">/init</code> generates can be inferred from your code already. Review it critically and delete anything Claude would figure out on its own — a lean CLAUDE.md is a powerful CLAUDE.md.</span>
+        </div>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('l4')">← Lesson 4</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l5" onclick="markDone('l5')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('l6')">Next: Plan Mode →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 6 -->
+    <div id="l6" class="tutorial-panel">
+      <div class="panel-header">
+        <div class="panel-num">06</div>
+        <div class="panel-meta">
+          <div class="panel-category">Advanced Basics</div>
+          <div class="panel-title">Plan Mode & Best Tips</div>
+          <div class="panel-desc">Use Plan Mode for complex tasks and learn the habits of productive Claude Code users.</div>
+        </div>
+        <div class="time-badge">⏱ 8 min</div>
+      </div>
+      <div class="lesson-body">
+        <h3>What is Plan Mode?</h3>
+        <p>Plan Mode is one of Claude Code's most important features. When you enter it with <code style="font-family:'Space Mono',monospace;color:var(--accent3)">/plan</code>, Claude shifts its behavior: instead of immediately writing code, it analyzes the problem and presents a step-by-step plan for your approval before anything is executed.</p>
+
+        <div class="code-block">
+          <span class="c-cmd">/plan</span><br>
+          <span class="c-out">Refactor the authentication module to use JWT tokens instead of session cookies.</span>
+        </div>
+
+        <p>Claude will: read relevant files → identify affected areas → outline changes in order → show its reasoning → <strong style="color:var(--text)">wait for your approval</strong> before executing a single line.</p>
+
+        <h3>When to use Plan Mode</h3>
+        <ul class="step-list">
+          <li><span class="step-num">→</span> <strong style="color:var(--text)">Complex refactoring</strong> — renaming a module imported across dozens of files</li>
+          <li><span class="step-num">→</span> <strong style="color:var(--text)">Multi-file features</strong> — new API endpoint touching routes, controllers, models, and tests</li>
+          <li><span class="step-num">→</span> <strong style="color:var(--text)">Unfamiliar codebases</strong> — understand the impact before making any changes</li>
+          <li><span class="step-num">→</span> <strong style="color:var(--text)">Learning</strong> — Claude's reasoning teaches you how your own codebase fits together</li>
+        </ul>
+
+        <h3>Writing better prompts</h3>
+        <p>The most common mistake is being too vague. Claude infers context well, but it works best when you share your thinking:</p>
+
+        <div class="code-block">
+          <span class="code-label">❌ Vague prompt</span>
+          <span class="c-out">Fix the dashboard performance issue.</span>
+        </div>
+        <div class="code-block">
+          <span class="code-label">✅ Better prompt</span>
+          <span class="c-out">Users are reporting the dashboard takes 15 seconds to load.<br>Check the API calls on the dashboard page and identify any<br>performance bottlenecks — look for N+1 queries or missing indexes.</span>
+        </div>
+
+        <h3>Ask Claude to research things</h3>
+        <p>Claude Code can search the web during a session. Use this explicitly:</p>
+        <div class="code-block">
+          <span class="c-out">I'm not sure about best practices for rate limiting with Redis.<br>Search the web for current approaches and factor that into the solution.</span>
+        </div>
+
+        <h3>Top 5 pro tips</h3>
+        <ul class="step-list">
+          <li><span class="step-num">1</span> <strong style="color:var(--text)">/clear often.</strong> Every new task = fresh context. Don't let old conversation history pollute your prompts.</li>
+          <li><span class="step-num">2</span> <strong style="color:var(--text)">Be specific about tests.</strong> Claude loves to mock things in tests. Say "write tests that exercise real functionality without mocking the core logic."</li>
+          <li><span class="step-num">3</span> <strong style="color:var(--text)">Verify outputs.</strong> Claude can generate logic errors. Read the diff before approving, especially for complex changes.</li>
+          <li><span class="step-num">4</span> <strong style="color:var(--text)">Use Plan Mode before big changes.</strong> It takes 30 seconds and saves hours of debugging bad assumptions.</li>
+          <li><span class="step-num">5</span> <strong style="color:var(--text)">Queue your prompts.</strong> While Claude works, type your next task. Claude will queue it and start when the current task completes.</li>
+        </ul>
+
+        <div class="tip-box">
+          <span class="tip-icon">🎉</span>
+          <span>You've completed all 6 lessons! You now have everything you need to be productive with Claude Code. The best next step is to open a real project, run <code style="font-family:'Space Mono',monospace">/init</code>, and start building. The workflow becomes natural quickly.</span>
+        </div>
+
+        <h3>Where to go next</h3>
+        <ul class="step-list">
+          <li><span class="step-num">→</span> Official docs: <strong style="color:var(--text)">docs.claude.com/en/docs/claude-code/overview</strong></li>
+          <li><span class="step-num">→</span> Learn about MCP servers to connect Claude Code to external tools</li>
+          <li><span class="step-num">→</span> Explore multi-agent workflows for parallel tasks</li>
+          <li><span class="step-num">→</span> Set up a code review workflow using Claude Code's git integration</li>
+        </ul>
+      </div>
+      <div class="panel-nav">
+        <button class="btn btn-ghost" onclick="navigate('l5')">← Lesson 5</button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="complete-btn" id="done-l6" onclick="markDone('l6')"><span class="check">○</span> Mark complete</button>
+          <button class="btn btn-primary" onclick="navigate('home-panel')">← Back to Overview</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const lessons = ['l1','l2','l3','l4','l5','l6'];
+  const completed = new Set();
+
+  function navigate(target) {
+    document.querySelectorAll('.tutorial-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+    document.querySelectorAll(`[data-target="${target}"]`).forEach(el => el.classList.add('active'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function markDone(id) {
+    completed.add(id);
+    const btn = document.getElementById(`done-${id}`);
+    btn.classList.add('done');
+    btn.innerHTML = '<span class="check">✓</span> Completed!';
+    
+    // Update card badge
+    const card = document.querySelector(`[data-target="${id}"].lesson-card`);
+    if (card) card.classList.add('done');
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const done = completed.size;
+    const total = lessons.length;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('lessons-done').textContent = `${done} / ${total} complete`;
+  }
+
+  // Wire up all navigation
+  document.querySelectorAll('[data-target]').forEach(el => {
+    el.addEventListener('click', () => navigate(el.getAttribute('data-target')));
+  });
+</script>
+</body>
+</html>
